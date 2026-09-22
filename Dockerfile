@@ -18,4 +18,4 @@ COPY . /app/
 
 EXPOSE 10000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:10000", "--workers", "3", "mundo_animal_web.wsgi:application"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && python create_superuser.py && gunicorn --bind 0.0.0.0:10000 --workers 3 mundo_animal_web.wsgi:application"]

@@ -7,7 +7,7 @@ databases:
 
 services:
   - type: web
-    name: mundo-animal-web
+    name: Mundo_Animal 
     runtime: docker
     plan: free
     region: oregon
