@@ -1,0 +1,139 @@
+{% extends 'tienda/base.html' %}
+{% block contenido %}
+
+<div class="page-header">
+    <div>
+        <h1>Citas</h1>
+        <p>Agendamiento de servicios de baño, peluquería y más</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'crear_cita' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> Nueva Cita
+        </a>
+    </div>
+</div>
+
+<!-- Mini KPIs de citas -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="bi bi-calendar-check-fill"></i></div>
+            <div class="stat-value">{{ citas|length }}</div>
+            <div class="stat-label">Total Citas</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon orange"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-value">
+                {% with pendientes=citas|dictsort:"estado" %}
+                    {% for c in citas %}{% if c.estado == 'Pendiente' %}{{ forloop.counter }}{% endif %}{% endfor %}
+                {% endwith %}
+                0
+            </div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
+            <div class="stat-value">
+                {% for c in citas %}{% if c.estado == 'Confirmada' %}{{ forloop.counter }}{% endif %}{% endfor %}
+                0
+            </div>
+            <div class="stat-label">Confirmadas</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Cliente / Mascota</th>
+                    <th>Servicio</th>
+                    <th>Fecha y Hora</th>
+                    <th class="text-center">Estado</th>
+                    <th class="text-end">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for c in citas %}
+                <tr>
+                    <td>
+                        <div class="cell-with-avatar">
+                            <div class="avatar-circle" style="background: linear-gradient(135deg, #9333ea, #7c3aed);">
+                                <i class="bi bi-calendar-event"></i>
+                            </div>
+                            <div>
+                                <div class="fw-semibold text-dark">{{ c.cliente.nombre }}</div>
+                                <small class="text-muted">🐾 {{ c.mascota.nombre }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge badge-soft-info">
+                            <i class="bi bi-scissors me-1"></i>{{ c.servicio }}
+                        </span>
+                    </td>
+                    <td>
+                        <i class="bi bi-clock text-muted me-1"></i>
+                        {{ c.fecha_hora|date:"d/m/Y H:i" }}
+                    </td>
+                    <td class="text-center">
+                        {% if c.estado == 'Confirmada' %}
+                            <span class="badge badge-soft-success">
+                                <i class="bi bi-check-circle-fill me-1"></i>{{ c.estado }}
+                            </span>
+                        {% elif c.estado == 'Pendiente' %}
+                            <span class="badge badge-soft-warning">
+                                <i class="bi bi-clock-fill me-1"></i>{{ c.estado }}
+                            </span>
+                        {% else %}
+                            <span class="badge badge-soft-danger">
+                                <i class="bi bi-x-circle-fill me-1"></i>{{ c.estado }}
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if c.estado == 'Pendiente' %}
+                            <a href="{% url 'confirmar_cita' c.id %}"
+                               class="btn btn-sm btn-success btn-icon me-1"
+                               title="Confirmar cita">
+                                <i class="bi bi-check-lg"></i>
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'editar_cita' c.id %}"
+                           class="btn btn-sm btn-outline-secondary btn-icon me-1"
+                           title="Editar">
+                            <i class="bi bi-pencil-fill"></i>
+                        </a>
+                        <a href="{% url 'eliminar_cita' c.id %}"
+                           class="btn btn-sm btn-outline-danger btn-icon"
+                           title="Eliminar"
+                           onclick="return confirm('¿Eliminar esta cita?')">
+                            <i class="bi bi-trash-fill"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">
+                        <div class="empty-state">
+                            <i class="bi bi-calendar-x"></i>
+                            <h5 class="mb-1">No hay citas programadas</h5>
+                            <p class="mb-3">Agenda la primera cita del sistema.</p>
+                            <a href="{% url 'crear_cita' %}" class="btn btn-primary">
+                                <i class="bi bi-plus-lg me-1"></i> Agendar Cita
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

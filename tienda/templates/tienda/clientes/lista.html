@@ -1,0 +1,74 @@
+{% extends 'tienda/base.html' %}
+{% block contenido %}
+
+<div class="page-header">
+    <div>
+        <h1>Clientes</h1>
+        <p>Gestión de clientes registrados en el sistema</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'crear_cliente' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> Nuevo Cliente
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Teléfono</th>
+                    <th>Dirección</th>
+                    <th class="text-center">Mascotas</th>
+                    <th class="text-end">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for c in clientes %}
+                <tr>
+                    <td>
+                        <div class="cell-with-avatar">
+                            <div class="avatar-circle">{{ c.nombre|first|upper }}</div>
+                            <div>
+                                <div class="fw-semibold text-dark">{{ c.nombre }}</div>
+                                <small class="text-muted">Registrado: {{ c.creado_en|date:"d/m/Y" }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td><i class="bi bi-telephone text-muted me-1"></i> {{ c.telefono }}</td>
+                    <td><i class="bi bi-geo-alt text-muted me-1"></i> {{ c.direccion }}</td>
+                    <td class="text-center">
+                        <span class="badge badge-soft-success">{{ c.total_mascotas }} 🐾</span>
+                    </td>
+                    <td class="text-end">
+                        <a href="{% url 'editar_cliente' c.id %}" class="btn btn-sm btn-outline-secondary btn-icon me-1" title="Editar">
+                            <i class="bi bi-pencil-fill"></i>
+                        </a>
+                        <a href="{% url 'eliminar_cliente' c.id %}" class="btn btn-sm btn-outline-danger btn-icon" title="Eliminar"
+                           onclick="return confirm('¿Eliminar este cliente?')">
+                            <i class="bi bi-trash-fill"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">
+                        <div class="empty-state">
+                            <i class="bi bi-people"></i>
+                            <h5 class="mb-1">No hay clientes registrados</h5>
+                            <p class="mb-3">Comienza registrando tu primer cliente.</p>
+                            <a href="{% url 'crear_cliente' %}" class="btn btn-primary">
+                                <i class="bi bi-plus-lg me-1"></i> Registrar Cliente
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

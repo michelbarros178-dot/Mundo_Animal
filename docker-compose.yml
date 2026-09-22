@@ -1,0 +1,48 @@
+services:
+
+  db:
+    image: postgres:16-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: mundo_animal_db
+      POSTGRES_USER: mundo_user
+      POSTGRES_PASSWORD: mundo_pass_2026
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mundo_user -d mundo_animal_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    command: sh -c "python manage.py collectstatic --noinput && python manage.py migrate --noinput && gunicorn --bind 0.0.0.0:8000 --workers 3 mundo_animal_web.wsgi:application"
+    volumes:
+      - static_volume:/app/staticfiles
+    expose:
+      - 8000
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=cambia-esto-por-una-clave-segura-en-produccion
+      - DATABASE_URL=postgres://mundo_user:mundo_pass_2026@db:5432/mundo_animal_db
+      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.25-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - static_volume:/app/staticfiles
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  static_volume:

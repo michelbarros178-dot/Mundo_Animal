@@ -1,0 +1,77 @@
+{% extends 'tienda/base.html' %}
+{% block contenido %}
+
+<div class="page-header">
+    <div>
+        <h1>Mascotas</h1>
+        <p>Registro de mascotas y sus dueños</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'crear_mascota' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> Nueva Mascota
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Mascota</th>
+                    <th>Especie</th>
+                    <th>Raza</th>
+                    <th class="text-center">Edad</th>
+                    <th>Dueño</th>
+                    <th class="text-end">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for m in mascotas %}
+                <tr>
+                    <td>
+                        <div class="cell-with-avatar">
+                            <div class="avatar-circle">🐾</div>
+                            <div class="fw-semibold text-dark">{{ m.nombre }}</div>
+                        </div>
+                    </td>
+                    <td><span class="badge badge-soft-info">{{ m.especie }}</span></td>
+                    <td>{{ m.raza }}</td>
+                    <td class="text-center">{{ m.edad }} año{{ m.edad|pluralize:"s" }}</td>
+                    <td>
+                        {% if m.cliente %}
+                            <i class="bi bi-person-fill text-muted me-1"></i>{{ m.cliente.nombre }}
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <a href="{% url 'editar_mascota' m.id %}" class="btn btn-sm btn-outline-secondary btn-icon me-1">
+                            <i class="bi bi-pencil-fill"></i>
+                        </a>
+                        <a href="{% url 'eliminar_mascota' m.id %}" class="btn btn-sm btn-outline-danger btn-icon"
+                           onclick="return confirm('¿Eliminar esta mascota?')">
+                            <i class="bi bi-trash-fill"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <i class="bi bi-heart"></i>
+                            <h5 class="mb-1">No hay mascotas registradas</h5>
+                            <p class="mb-3">Registra la primera mascota del sistema.</p>
+                            <a href="{% url 'crear_mascota' %}" class="btn btn-primary">
+                                <i class="bi bi-plus-lg me-1"></i> Registrar Mascota
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

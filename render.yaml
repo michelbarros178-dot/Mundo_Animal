@@ -1,0 +1,24 @@
+databases:
+  - name: mundo-animal-db
+    databaseName: mundo_animal_db
+    user: mundo_user
+    plan: free # Usa el plan gratuito
+
+services:
+  - type: web
+    name: mundo-animal-web
+    runtime: docker
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mundo-animal-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true # Render genera una clave segura automáticamente
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        value: .onrender.com # Permite el dominio que Render te asigna
+      - key: PYTHON_VERSION
+        value: 3.12.0
